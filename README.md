@@ -5,7 +5,7 @@
 ## 설치 방법
 
 ```bash
-pip install git+https://github.com/your_username/soo_functions_project.git
+pip install git+https://github.com/sooyoung-wind/soo_functions.git
 ```
 
 ## 사용 예제
