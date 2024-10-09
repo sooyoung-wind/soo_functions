@@ -7,6 +7,10 @@
 ```bash
 pip install git+https://github.com/sooyoung-wind/soo_functions.git
 ```
+or
+```bash
+poetry add git+https://github.com/sooyoung-wind/soo_functions.git
+```
 
 ## 사용 예제
 
