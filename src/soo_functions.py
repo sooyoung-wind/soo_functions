@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import random
 import os
+from typing import Union
 
 # PyTorch 임포트를 시도하고, 실패하면 None으로 설정
 try:
@@ -65,3 +66,44 @@ def seed_everything(seed: int = 9234, set_torch_seed: bool = True) -> None:
             torch.backends.cudnn.benchmark = True
         else:
             print("PyTorch가 설치되어 있지 않습니다. PyTorch 시드 설정은 건너뜁니다.")
+
+
+def trans_to_WSWD(u: Union[np.ndarray, list], v: Union[np.ndarray, list]) -> pd.DataFrame:
+    """
+    주어진 u, v 성분을 이용해 풍속(ws)과 풍향(wd)을 계산하는 함수.
+
+    풍향(wd)은 270도에서 시작하여 북쪽을 0도로 기준으로 시계방향으로 계산됩니다.
+    풍속(ws)은 u, v 성분의 제곱 합에 루트를 씌워 계산됩니다.
+
+    Args:
+        u (np.ndarray or list): 동서 방향의 풍속 성분
+        v (np.ndarray or list): 남북 방향의 풍속 성분
+
+    Returns:
+        pd.DataFrame: 풍속(ws)과 풍향(wd)을 포함하는 데이터프레임
+    """
+    wd = (270 - np.arctan2(v, u) * 180 / np.pi) % 360
+    ws = np.sqrt(u**2 + v**2)
+    data_results = pd.DataFrame({'ws': ws, 'wd': wd})
+    return data_results
+
+
+def trans_to_UV(ws: Union[np.ndarray, list], wd: Union[np.ndarray, list]) -> pd.DataFrame:
+    """
+    주어진 풍속(ws)과 풍향(wd)을 이용해 u, v 성분을 계산하는 함수.
+
+    풍향(wd)은 북쪽을 0도로 기준으로 시계방향으로 측정되며,
+    이를 이용해 u(동서 방향)과 v(남북 방향) 성분을 계산합니다.
+
+    Args:
+        ws (np.ndarray or list): 풍속
+        wd (np.ndarray or list): 풍향 (단위: 도)
+
+    Returns:
+        pd.DataFrame: u(동서 방향 성분)과 v(남북 방향 성분)을 포함하는 데이터프레임
+    """
+    rad = np.pi / 180
+    u = -ws * np.sin(rad * wd)
+    v = -ws * np.cos(rad * wd)
+    data_results = pd.DataFrame({'u': u, 'v': v})
+    return data_results
